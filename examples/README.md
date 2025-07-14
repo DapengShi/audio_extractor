@@ -110,3 +110,33 @@ else
     exit 1
 fi
 ```
+
+### `verify_audio.rs`
+A standalone audio file verification tool that can validate any audio file independently.
+
+**Usage:**
+```bash
+# Build the example
+cargo build --example verify_audio
+
+# Run the verification tool
+./target/debug/examples/verify_audio audio_file.mp3
+
+# Example output:
+# Audio File Verification Tool
+# ============================
+# File: "audio_file.mp3"
+# 
+# ✓ Audio file verification successful!
+#   - Format: mp3
+#   - Duration: 180.45 seconds
+#   - Channels: 2
+#   - Sample rate: 44100 Hz
+#   - File size: 1048576 bytes
+```
+
+**Features:**
+- Validates audio file format and structure
+- Extracts and displays metadata
+- Provides detailed error messages
+- Can be used in scripts and pipelines

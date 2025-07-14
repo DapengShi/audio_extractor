@@ -6,9 +6,32 @@ use std::path::PathBuf;
 
 fn create_test_video_file(size_kb: usize) -> NamedTempFile {
     let temp_file = NamedTempFile::with_suffix(".mp4").unwrap();
-    let data = vec![0u8; size_kb * 1024]; // Create fake video data
-    fs::write(temp_file.path(), data).unwrap();
-    temp_file
+    
+    // Create a minimal test video file using FFmpeg
+    let output = std::process::Command::new("ffmpeg")
+        .arg("-f").arg("lavfi")
+        .arg("-i").arg("testsrc=duration=1:size=320x240:rate=30")
+        .arg("-f").arg("lavfi")
+        .arg("-i").arg("sine=frequency=1000:duration=1")
+        .arg("-c:v").arg("libx264")
+        .arg("-c:a").arg("aac")
+        .arg("-t").arg("1")
+        .arg("-y") // Overwrite if exists
+        .arg(temp_file.path())
+        .output();
+    
+    match output {
+        Ok(output) if output.status.success() => {
+            // Successfully created test video
+            temp_file
+        }
+        _ => {
+            // FFmpeg failed or not available, create fake data as fallback
+            let data = vec![0u8; size_kb * 1024];
+            fs::write(temp_file.path(), data).unwrap();
+            temp_file
+        }
+    }
 }
 
 fn benchmark_audio_extraction(c: &mut Criterion) {
@@ -29,6 +52,7 @@ fn benchmark_audio_extraction(c: &mut Criterion) {
                     output: output_path,
                     format: AudioFormat::Mp3,
                     quality: 128,
+                    verify: false, // Skip verification for speed
                 };
                 
                 let extractor = AudioExtractor::new(args);
@@ -52,6 +76,7 @@ fn benchmark_validation(c: &mut Criterion) {
         output: output_path,
         format: AudioFormat::Mp3,
         quality: 128,
+        verify: false, // Skip verification for speed
     };
     
     let extractor = AudioExtractor::new(args);
@@ -74,6 +99,7 @@ fn benchmark_format_detection(c: &mut Criterion) {
         output: temp_dir.path().join("output.mp3"),
         format: AudioFormat::Mp3,
         quality: 128,
+        verify: false, // Skip verification for speed
     };
     
     let extractor = AudioExtractor::new(args);
@@ -120,6 +146,7 @@ fn benchmark_different_formats(c: &mut Criterion) {
                     output: output_path,
                     format: format.clone(),
                     quality: 128,
+                    verify: false, // Skip verification for speed
                 };
                 
                 let extractor = AudioExtractor::new(args);
@@ -148,6 +175,7 @@ fn benchmark_different_qualities(c: &mut Criterion) {
                     output: output_path,
                     format: AudioFormat::Mp3,
                     quality,
+                    verify: false, // Skip verification for speed
                 };
                 
                 let extractor = AudioExtractor::new(args);
