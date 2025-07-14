@@ -1,0 +1,49 @@
+# Audio Extractor Configuration Example
+# This is a future feature - not yet implemented
+
+[defaults]
+format = "mp3"
+quality = 192
+output_dir = "./extracted_audio"
+
+[formats.mp3]
+quality_range = [64, 320]
+default_quality = 192
+description = "MPEG Audio Layer III - Universal compatibility"
+
+[formats.wav]
+quality_range = [0, 0]  # Lossless
+default_quality = 0
+description = "Waveform Audio File - Uncompressed, largest file size"
+
+[formats.flac]
+quality_range = [0, 0]  # Lossless
+default_quality = 0
+compression_level = 5
+description = "Free Lossless Audio Codec - Lossless compression"
+
+[formats.aac]
+quality_range = [64, 320]
+default_quality = 192
+description = "Advanced Audio Coding - Better compression than MP3"
+
+[presets]
+[presets.voice]
+format = "mp3"
+quality = 64
+description = "Optimized for voice recordings"
+
+[presets.music]
+format = "mp3"
+quality = 192
+description = "Good quality for music"
+
+[presets.audiophile]
+format = "flac"
+quality = 0
+description = "Lossless quality for audiophiles"
+
+[presets.podcast]
+format = "mp3"
+quality = 128
+description = "Standard quality for podcasts"
