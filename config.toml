@@ -1,0 +1,4 @@
+[defaults]
+format = "wav"
+quality = 192
+verify = true

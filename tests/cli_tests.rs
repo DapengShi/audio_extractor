@@ -242,8 +242,8 @@ fn test_full_workflow() {
     let args = Args {
         input: temp_input.path().to_path_buf(),
         output: output_path.clone(),
-        format: AudioFormat::Mp3,
-        quality: 192,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(192),
         verify: false,
     };
     
@@ -277,8 +277,8 @@ fn test_multiple_extractions() {
     for (format, filename, quality) in test_cases {
         let output_path = temp_dir.path().join(filename);
         let mut args = common::create_test_args(temp_input.path().to_path_buf(), output_path.clone());
-        args.format = format;
-        args.quality = quality;
+        args.format = Some(format);
+        args.quality = Some(quality);
         let extractor = AudioExtractor::new(args);
         assert!(extractor.extract().is_ok());
         assert!(output_path.exists());
@@ -294,8 +294,8 @@ fn test_error_handling_chain() {
     let args1 = Args {
         input: PathBuf::from("/definitely/does/not/exist.mp4"),
         output: output_path.clone(),
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: false,
     };
     
@@ -309,8 +309,8 @@ fn test_error_handling_chain() {
     let args2 = Args {
         input: temp_file.path().to_path_buf(),
         output: output_path,
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: false,
     };
     

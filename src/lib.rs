@@ -1,7 +1,7 @@
 use clap::{Parser, ValueEnum};
 use anyhow::{Result, Context};
 use std::path::PathBuf;
-use std::fs::File;
+use std::fs;
 use std::process::Command;
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::probe::Hint;
@@ -10,32 +10,34 @@ use symphonia::core::meta::MetadataOptions;
 use symphonia::default::get_probe;
 use chrono;
 use serde_json;
+use serde::Deserialize;
+use std::fs::File;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     /// Input video file path
-    #[arg(short, long)]
+    #[arg(short, long, required = true)]
     pub input: PathBuf,
     
     /// Output audio file path
-    #[arg(short, long)]
+    #[arg(short, long, required = true)]
     pub output: PathBuf,
     
     /// Output audio format
-    #[arg(short, long, default_value = "mp3")]
-    pub format: AudioFormat,
+    #[arg(short, long)]
+    pub format: Option<AudioFormat>,
     
     /// Audio quality (bitrate in kbps)
-    #[arg(short, long, default_value = "128")]
-    pub quality: u32,
+    #[arg(short, long)]
+    pub quality: Option<u32>,
     
     /// Verify the output audio file after extraction
-    #[arg(long, default_value = "false")]
+    #[arg(long)]
     pub verify: bool,
 }
 
-#[derive(Clone, ValueEnum, Debug, PartialEq)]
+#[derive(Clone, ValueEnum, Debug, PartialEq, Deserialize)]
 pub enum AudioFormat {
     Mp3,
     Wav,
@@ -69,12 +71,58 @@ pub struct VideoInfo {
 }
 
 pub struct AudioExtractor {
-    args: Args,
+    pub args: Args,
+}
+
+#[derive(Deserialize, Debug, Default)]
+pub struct Config {
+    pub defaults: Option<Defaults>,
+}
+
+#[derive(Deserialize, Debug, Default)]
+pub struct Defaults {
+    pub format: Option<AudioFormat>,
+    pub quality: Option<u32>,
+    pub verify: Option<bool>,
 }
 
 impl AudioExtractor {
-    pub fn new(args: Args) -> Self {
+    pub fn new(mut args: Args) -> Self {
+        if let Some(config) = Self::load_config() {
+            if let Some(defaults) = config.defaults {
+                if args.format.is_none() {
+                    args.format = defaults.format;
+                }
+                if args.quality.is_none() {
+                    args.quality = defaults.quality;
+                }
+                if !args.verify {
+                    args.verify = defaults.verify.unwrap_or(false);
+                }
+            }
+        }
+
+        if args.format.is_none() {
+            args.format = Some(AudioFormat::Mp3);
+        }
+
+        if args.quality.is_none() {
+            args.quality = Some(128);
+        }
+
         Self { args }
+    }
+
+    pub fn load_config() -> Option<Config> {
+        let config_path = PathBuf::from("config.toml");
+        if config_path.exists() {
+            if let Ok(content) = fs::read_to_string(config_path) {
+                if let Ok(config) = toml::from_str(&content) {
+                    return Some(config);
+                }
+            }
+        }
+        None
     }
     
     pub fn extract(&self) -> Result<()> {
@@ -183,17 +231,15 @@ impl AudioExtractor {
         for input in inputs {
             let input_path = input.as_ref();
             let stem = input_path.file_stem()
-                .context("Failed to get file stem")?
-                .to_str()
-                .context("Invalid file name")?;
+                .context("Failed to get file stem")?;
             
-            let output_path = output_dir.as_ref().join(format!("{}.{}", stem, format));
+            let output_path = output_dir.as_ref().join(format!("{}.{}", stem.to_string_lossy(), format));
             
             let args = Args {
                 input: input_path.to_path_buf(),
                 output: output_path.clone(),
-                format: format.clone(),
-                quality,
+                format: Some(format.clone()),
+                quality: Some(quality),
                 verify,
             };
             
@@ -238,7 +284,7 @@ impl AudioExtractor {
     
     fn extract_audio(&self) -> Result<()> {
         println!("Extracting audio from {:?} to {:?}", self.args.input, self.args.output);
-        println!("Format: {}, Quality: {} kbps", self.args.format, self.args.quality);
+        println!("Format: {}, Quality: {} kbps", self.args.format.as_ref().unwrap(), self.args.quality.unwrap());
         
         // Check if FFmpeg is available
         if !self.is_ffmpeg_available() {
@@ -266,10 +312,10 @@ impl AudioExtractor {
         cmd.arg("-y");
         
         // Audio codec and format settings
-        match self.args.format {
+        match self.args.format.as_ref().unwrap() {
             AudioFormat::Mp3 => {
                 cmd.arg("-c:a").arg("libmp3lame");
-                cmd.arg("-b:a").arg(format!("{}k", self.args.quality));
+                cmd.arg("-b:a").arg(format!("{}k", self.args.quality.unwrap()));
             }
             AudioFormat::Wav => {
                 cmd.arg("-c:a").arg("pcm_s16le");
@@ -281,7 +327,7 @@ impl AudioExtractor {
             }
             AudioFormat::Aac => {
                 cmd.arg("-c:a").arg("aac");
-                cmd.arg("-b:a").arg(format!("{}k", self.args.quality));
+                cmd.arg("-b:a").arg(format!("{}k", self.args.quality.unwrap()));
             }
         }
         
@@ -324,8 +370,8 @@ impl AudioExtractor {
              # \n\
              # Generated by audio_extractor at: {}\n",
             self.args.input,
-            self.args.format,
-            self.args.quality,
+            self.args.format.as_ref().unwrap(),
+            self.args.quality.unwrap(),
             chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
         );
         
@@ -481,4 +527,3 @@ impl AudioExtractor {
         vec![AudioFormat::Mp3, AudioFormat::Wav, AudioFormat::Flac, AudioFormat::Aac]
     }
 }
-

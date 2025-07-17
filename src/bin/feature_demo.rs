@@ -29,8 +29,8 @@ fn main() -> Result<()> {
     let args = Args {
         input: Path::new(test_video).to_path_buf(),
         output: mp3_output.clone(),
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: true,
     };
     
@@ -58,8 +58,8 @@ fn main() -> Result<()> {
         let args = Args {
             input: Path::new(test_video).to_path_buf(),
             output: output_file.clone(),
-            format,
-            quality,
+            format: Some(format),
+            quality: Some(quality),
             verify: false, // Skip verification to speed up demo
         };
         
@@ -87,8 +87,8 @@ fn main() -> Result<()> {
         let args = Args {
             input: Path::new(test_video).to_path_buf(),
             output: output_file.clone(),
-            format: AudioFormat::Mp3,
-            quality,
+            format: Some(AudioFormat::Mp3),
+            quality: Some(quality),
             verify: false,
         };
         
@@ -112,8 +112,8 @@ fn main() -> Result<()> {
     let args = Args {
         input: Path::new(test_video).to_path_buf(),
         output: verify_file.clone(),
-        format: AudioFormat::Mp3,
-        quality: 192,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(192),
         verify: true,
     };
     

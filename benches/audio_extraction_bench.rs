@@ -50,8 +50,8 @@ fn benchmark_audio_extraction(c: &mut Criterion) {
                 let args = Args {
                     input: temp_input.path().to_path_buf(),
                     output: output_path,
-                    format: AudioFormat::Mp3,
-                    quality: 128,
+                    format: Some(AudioFormat::Mp3),
+                    quality: Some(128),
                     verify: false, // Skip verification for speed
                 };
                 
@@ -74,8 +74,8 @@ fn benchmark_validation(c: &mut Criterion) {
     let args = Args {
         input: temp_input.path().to_path_buf(),
         output: output_path,
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: false, // Skip verification for speed
     };
     
@@ -97,8 +97,8 @@ fn benchmark_format_detection(c: &mut Criterion) {
     let args = Args {
         input: temp_dir.path().join("test.mp4"),
         output: temp_dir.path().join("output.mp3"),
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: false, // Skip verification for speed
     };
     
@@ -144,8 +144,8 @@ fn benchmark_different_formats(c: &mut Criterion) {
                 let args = Args {
                     input: temp_input.path().to_path_buf(),
                     output: output_path,
-                    format: format.clone(),
-                    quality: 128,
+                    format: Some(format.clone()),
+                    quality: Some(128),
                     verify: false, // Skip verification for speed
                 };
                 
@@ -173,8 +173,8 @@ fn benchmark_different_qualities(c: &mut Criterion) {
                 let args = Args {
                     input: temp_input.path().to_path_buf(),
                     output: output_path,
-                    format: AudioFormat::Mp3,
-                    quality,
+                    format: Some(AudioFormat::Mp3),
+                    quality: Some(quality),
                     verify: false, // Skip verification for speed
                 };
                 

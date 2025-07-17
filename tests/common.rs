@@ -38,8 +38,8 @@ pub fn create_test_args(input: PathBuf, output: PathBuf) -> Args {
     Args {
         input,
         output,
-        format: AudioFormat::Mp3,
-        quality: 128,
+        format: Some(AudioFormat::Mp3),
+        quality: Some(128),
         verify: false,
     }
 }

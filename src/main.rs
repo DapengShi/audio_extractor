@@ -5,18 +5,18 @@ use anyhow::Result;
 fn main() -> Result<()> {
     let args = Args::parse();
     
+    let extractor = AudioExtractor::new(args);
+
     // Show what we're about to do
     println!("Audio Extractor v{}", env!("CARGO_PKG_VERSION"));
-    println!("Input: {:?}", args.input);
-    println!("Output: {:?}", args.output);
-    println!("Format: {}", args.format);
-    println!("Quality: {} kbps", args.quality);
-    if args.verify {
+    println!("Input: {:?}", extractor.args.input);
+    println!("Output: {:?}", extractor.args.output);
+    println!("Format: {}", extractor.args.format.as_ref().unwrap());
+    println!("Quality: {} kbps", extractor.args.quality.unwrap());
+    if extractor.args.verify {
         println!("Verification: enabled");
     }
     println!();
-    
-    let extractor = AudioExtractor::new(args);
     
     match extractor.extract_with_progress(|msg| println!("📄 {}", msg)) {
         Ok(()) => {

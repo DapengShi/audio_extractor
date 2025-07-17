@@ -409,21 +409,20 @@ Verifying audio file: "audio.mp3"
 Audio extraction completed successfully!
 ```
 
-### Configuration File (Future Feature)
+### Configuration File
+
+You can use a `config.toml` file to set default values for the command-line arguments. The tool will look for a `config.toml` file in the current directory.
+
+Here is an example of a `config.toml` file:
+
 ```toml
-# config.toml
 [defaults]
-format = "mp3"
+format = "wav"
 quality = 192
-output_dir = "./extracted_audio"
-
-[formats.mp3]
-quality_range = [64, 320]
-default_quality = 192
-
-[formats.flac]
-compression_level = 5
+verify = true
 ```
+
+These default values can be overridden by providing the corresponding command-line arguments.
 
 ### Integration with Other Tools
 ```bash
