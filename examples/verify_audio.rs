@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     println!("🔍 Analyzing audio file...");
     
-    match AudioExtractor::verify_audio_file_standalone(&audio_file.to_path_buf()) {
+    match AudioExtractor::verify_standalone(&audio_file.to_path_buf()) {
         Ok(info) => {
             println!("✅ Audio file verification successful!");
             println!();

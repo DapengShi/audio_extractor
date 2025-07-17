@@ -1,5 +1,7 @@
 # 🎵 Audio Extractor
 
+> **Note:** This project is an experiment to test the capabilities of the Gemini CLI and other AI-powered development tools. The code is not intended for production use.
+
 A high-performance audio extraction tool that uses FFmpeg to extract audio from video files. Supports multiple output formats with batch processing, progress display, and audio verification features.
 
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
@@ -456,22 +458,36 @@ cargo fmt --check
 cargo clippy
 ```
 
-### Running Tests
-```bash
-# Run all tests
-./run_tests.sh
+## 🧪 Testing
 
-# Run specific test types
-cargo test --lib          # Unit tests
-cargo test --test cli_tests   # CLI tests
-cargo bench               # Performance tests
+This project includes a comprehensive test suite to ensure code quality and correctness.
+
+### Running Tests
+
+To run all tests, use the following command:
+
+```bash
+cargo test
 ```
 
-# License
-This project is licensed under the Apache License 2.0. You can freely use, modify, and distribute the code as long as you comply with the terms of the license.
+This will run unit tests, integration tests, and documentation tests.
 
-# Acknowledgments
-This project is helped by the Copilot agent
+### Test Structure
+
+The tests are organized into the following directories:
+
+*   `tests/`: Contains integration tests that test the public API of the `audio_extractor` crate.
+*   `src/`: Contains unit tests that test individual functions and modules.
+
+### Shared Test Utilities
+
+The `tests/common.rs` file contains shared test utilities, such as the `create_test_video_file` function, which is used by both unit and integration tests. This helps to reduce code duplication and makes the tests easier to maintain.
+
+
+## 🙏 Acknowledgments
+
+This project was developed with the assistance of AI tools.
+
 
 ## Audio File Verification
 

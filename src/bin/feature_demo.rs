@@ -128,7 +128,7 @@ fn main() -> Result<()> {
     println!("=======================================");
     
     if verify_file.exists() {
-        match AudioExtractor::verify_audio_file_standalone(&verify_file) {
+        match AudioExtractor::verify_standalone(&verify_file) {
             Ok(info) => {
                 println!("  ✅ File verification successful!");
                 println!("    📊 Format: {}", info.format);
